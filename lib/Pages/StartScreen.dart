@@ -1,131 +1,118 @@
 import 'package:flutter/material.dart';
-import 'professor_intro.dart'; // 👈 Import your new screen
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:pokemon/Pages/load_or_new_game.dart';
+import 'package:pokemon/Button.dart'; // Uses your circular ControlButton
 
-class BootScreen extends StatelessWidget {
-  const BootScreen({super.key});
+class StartScreen extends StatelessWidget {
+  const StartScreen({super.key});
 
-  void _goToProfessorIntro(BuildContext context) {
+  void _startGame(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    final hasJwt = prefs.containsKey('jwt');
+
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const ProfessorIntro()),
+      MaterialPageRoute(builder: (context) => const LoadOrNewGame()),
     );
   }
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () => _goToProfessorIntro(context),
-      child: Scaffold(
-        backgroundColor: Colors.black,
-        body: Stack(
-          children: [
-            // Background image
-            Positioned(
-              top: 0,
-              left: 0,
-              right: 0,
-              height: MediaQuery.of(context).size.height * 0.4,
-              child: Image.asset(
-                'Assets/StartScreen.jpg',
-                fit: BoxFit.cover,
-              ),
-            ),
+    final screenHeight = MediaQuery.of(context).size.height;
 
-            // "Tap to Continue" text
-            Positioned(
-              top: MediaQuery.of(context).size.height * 0.35,
-              left: 0,
-              right: 0,
-              child: const Center(
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: Stack(
+        children: [
+          // Top half background image
+          Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            height: screenHeight * 0.5,
+            child: Image.asset(
+              'assets/StartScreen.jpg',
+              fit: BoxFit.cover,
+              errorBuilder: (context, error, stackTrace) => const Center(
                 child: Text(
-                  'Tap to Continue',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 28,
-                    fontWeight: FontWeight.bold,
-                    shadows: [
-                      Shadow(blurRadius: 10, color: Colors.black, offset: Offset(2, 2)),
-                    ],
-                  ),
+                  'Missing StartScreen.jpg',
+                  style: TextStyle(color: Colors.red),
                 ),
               ),
             ),
+          ),
 
-            // D-pad + A/B buttons
-            Positioned(
-              bottom: MediaQuery.of(context).size.height * 0.20,
-              left: 0,
-              right: 0,
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.spaceAround,
-                crossAxisAlignment: CrossAxisAlignment.end,
+          // D-pad (bottom-left)
+          Positioned(
+            bottom: 100,
+            left: 30,
+            child: Column(
+              children: [
+                ControlButton(label: '', onPressed: () {}), // Up
+                Row(
+                  children: [
+                    ControlButton(label: '', onPressed: () {}), // Left
+                    const SizedBox(width: 40),
+                    ControlButton(label: '', onPressed: () {}), // Right
+                  ],
+                ),
+                ControlButton(label: '', onPressed: () {}), // Down
+              ],
+            ),
+          ),
+
+          // A/B buttons - diagonal with proper spacing
+          Positioned(
+            bottom: 100,
+            right: 40,
+            child: SizedBox(
+              width: 160,
+              height: 160,
+              child: Stack(
                 children: [
-                  // D-pad
-                  Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      _ControlButton(label: '↑', onPressed: () => print('Up')),
-                      Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          _ControlButton(label: '←', onPressed: () => print('Left')),
-                          const SizedBox(width: 40),
-                          _ControlButton(label: '→', onPressed: () => print('Right')),
-                        ],
-                      ),
-                      _ControlButton(label: '↓', onPressed: () => print('Down')),
-                    ],
+                  // A button (top-right corner)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: ControlButton(
+                      label: 'A',
+                      onPressed: () => _startGame(context),
+                    ),
                   ),
-
-                  // A/B buttons
-                  Stack(
-                    alignment: Alignment.center,
-                    children: [
-                      Transform.translate(
-                        offset: const Offset(30, 0),
-                        child: _ControlButton(
-                          label: 'A',
-                          onPressed: () => _goToProfessorIntro(context),
-                        ),
-                      ),
-                      Transform.translate(
-                        offset: const Offset(-30, 40),
-                        child: _ControlButton(
-                          label: 'B',
-                          onPressed: () => _goToProfessorIntro(context),
-                        ),
-                      ),
-                    ],
+                  // B button (lower-left corner, spaced out)
+                  Positioned(
+                    bottom: 10,
+                    left: 10,
+                    child: ControlButton(
+                      label: 'B',
+                      onPressed: () => _startGame(context),
+                    ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
-    );
-  }
-}
+          ),
 
-// 🎮 GameBoy-style button
-class _ControlButton extends StatelessWidget {
-  final String label;
-  final VoidCallback onPressed;
 
-  const _ControlButton({required this.label, required this.onPressed});
 
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.all(8.0),
-      child: ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          shape: const CircleBorder(),
-          padding: const EdgeInsets.all(20),
-          backgroundColor: Colors.grey[800],
-        ),
-        onPressed: onPressed,
-        child: Text(label, style: const TextStyle(fontSize: 18)),
+
+          // Tap to Start text (bottom center)
+          Align(
+            alignment: Alignment.bottomCenter,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 30),
+              child: Text(
+                'Tap A or B to Start',
+                style: TextStyle(
+                  fontSize: 18,
+                  color: Colors.white.withOpacity(0.95),
+                  fontWeight: FontWeight.bold,
+                  shadows: const [Shadow(blurRadius: 2, color: Colors.black)],
+                ),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

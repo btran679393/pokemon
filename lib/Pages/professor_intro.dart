@@ -1,26 +1,21 @@
 import 'package:flutter/material.dart';
-import '../choose_pokemon.dart';
+import 'professor_office.dart'; // Next screen
 
-class ProfessorIntro extends StatefulWidget {
-  const ProfessorIntro({super.key});
+class ProfessorIntro extends StatelessWidget {
+  final String playerName;
 
-  @override
-  State<ProfessorIntro> createState() => _ProfessorIntroState();
-}
+  const ProfessorIntro({super.key, required this.playerName});
 
-class _ProfessorIntroState extends State<ProfessorIntro> {
-  final TextEditingController _nameController = TextEditingController();
-
-  void _goToChoosePokemon() {
-    final name = _nameController.text.trim();
-    if (name.isNotEmpty) {
-      Navigator.push(
-        context,
-        MaterialPageRoute(
-          builder: (context) => ChoosePokemon(playerName: name),
+  void _goToNext(BuildContext context) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfessorOffice(
+          playerName: playerName,
+          starterPokemon: 'Charmander', // TODO: replace with actual selection later
         ),
-      );
-    }
+      ),
+    );
   }
 
   @override
@@ -32,39 +27,33 @@ class _ProfessorIntroState extends State<ProfessorIntro> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            // 🧪 Professor Dan image fills top half
+            // Professor Dan image
             SizedBox(
               height: screenHeight * 0.5,
               width: double.infinity,
               child: Image.asset(
-                'Assets/professorDan.jpg',
+                'assets/professorDan.jpg',
                 fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => const Center(
+                  child: Text(
+                    'Missing: professorDan.jpg',
+                    style: TextStyle(color: Colors.red),
+                  ),
+                ),
               ),
             ),
             Padding(
               padding: const EdgeInsets.all(24.0),
               child: Column(
                 children: [
-                  const Text(
-                    "Hello there! Welcome to the world of Pokémon!\nI'm Professor Dan.\nWhat is your name?",
+                  Text(
+                    "Hello there, $playerName!\nWelcome to the world of Pokémon!\nI'm Professor Dan.",
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white, fontSize: 20),
+                    style: const TextStyle(color: Colors.white, fontSize: 20),
                   ),
-                  const SizedBox(height: 20),
-                  TextField(
-                    controller: _nameController,
-                    decoration: InputDecoration(
-                      hintText: "Enter your name",
-                      filled: true,
-                      fillColor: Colors.white,
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 30),
                   ElevatedButton(
-                    onPressed: _goToChoosePokemon,
+                    onPressed: () => _goToNext(context),
                     child: const Text("Next"),
                   ),
                 ],

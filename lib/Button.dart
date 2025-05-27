@@ -1,21 +1,19 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 class BootScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    // TODO: implement build
+    // You can implement this later
     throw UnimplementedError();
   }
-  // ... your existing BootScreen code ...
 }
 
-// 👇 Add this directly below BootScreen (outside it)
-class _ControlButton extends StatelessWidget {
+// ✅ Now a public widget you can import and reuse
+class ControlButton extends StatelessWidget {
   final String label;
   final VoidCallback onPressed;
 
-  const _ControlButton({required this.label, required this.onPressed});
+  const ControlButton({required this.label, required this.onPressed, super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -28,7 +26,7 @@ class _ControlButton extends StatelessWidget {
           backgroundColor: Colors.grey[800],
         ),
         onPressed: onPressed,
-        child: Text(label, style: const TextStyle(fontSize: 18)),
+        child: Text(label, style: const TextStyle(fontSize: 18, color: Colors.white)),
       ),
     );
   }
